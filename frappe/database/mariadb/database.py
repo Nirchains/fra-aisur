@@ -40,6 +40,7 @@ class MariaDBDatabase(Database):
 			'Text':			('text', ''),
 			'Data':			('varchar', self.VARCHAR_LEN),
 			'Link':			('varchar', self.VARCHAR_LEN),
+   			'Link MultiSelect':			('varchar', self.VARCHAR_LEN),
 			'Dynamic Link':	('varchar', self.VARCHAR_LEN),
 			'Password':		('text', ''),
 			'Select':		('varchar', self.VARCHAR_LEN),

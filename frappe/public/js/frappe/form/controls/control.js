@@ -10,6 +10,7 @@ import './datetime';
 import './date_range';
 import './select';
 import './link';
+import './link_multiselect';
 import './dynamic_link';
 import './text';
 import './code';
