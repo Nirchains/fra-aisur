@@ -93,12 +93,12 @@ frappe.ui.form.ControlLinkMultiSelect = frappe.ui.form.ControlLink.extend({
 	},
 	get_pill_html(value) {
 		const encoded_value = encodeURIComponent(value);
-		return `<div class="btn-group tb-selected-value" data-value="${encoded_value}">
-			<button class="btn btn-default btn-xs btn-link-to-form">${__(value)}</button>
-			<button class="btn btn-default btn-xs btn-remove">
-				<i class="fa fa-remove text-muted"></i>
-			</button>
-		</div>`;
+		return `
+			<button class="data-pill btn tb-selected-value" data-value="${encoded_value}">
+			<span class="btn-link-to-form">${__(value)}</span>
+			<span class="btn-remove">${frappe.utils.icon('close')}</span></button>
+		`;
+
 	},
 
 	get_value() {
