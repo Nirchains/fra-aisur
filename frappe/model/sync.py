@@ -58,6 +58,12 @@ def sync_for(app_name, force=0, sync_everything = False, verbose=False, reset_pe
 			("desk", "workspace")):
 			files.append(os.path.join(frappe.get_app_path("frappe"), d[0],
 				"doctype", d[1], d[1] + ".json"))
+	#PFG
+	if app_name == "aisurveys":
+		# these need to go first at time of install
+		for d in (("aisurveys", "aielement_template")):
+			files.append(os.path.join(frappe.get_app_path("frappe"), d[0],
+				"doctype", d[1], d[1] + ".json"))
 
 	for module_name in frappe.local.app_modules.get(app_name) or []:
 		folder = os.path.dirname(frappe.get_module(app_name + "." + module_name).__file__)
