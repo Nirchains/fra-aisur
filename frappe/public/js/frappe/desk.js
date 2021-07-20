@@ -48,6 +48,8 @@ frappe.Application = Class.extend({
 		this.make_nav_bar();
 		this.set_favicon();
 		this.setup_analytics();
+		//PFG
+		localStorage.container_fullwidth = 'true';
 		this.set_fullwidth_if_enabled();
 		this.add_browser_class();
 		this.setup_energy_point_listeners();
