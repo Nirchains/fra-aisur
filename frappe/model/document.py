@@ -18,6 +18,7 @@ from frappe.utils.global_search import update_global_search
 from frappe.integrations.doctype.webhook import run_webhooks
 from frappe.desk.form.document_follow import follow_document
 from frappe.core.doctype.server_script.server_script_utils import run_server_script_for_doc_event
+from frappe.utils.data import get_absolute_url
 
 # once_only validation
 # methods
@@ -494,6 +495,7 @@ class Document(BaseDocument):
 		self._validate_selects()
 		self._validate_non_negative()
 		self._validate_length()
+		self._validate_code_fields()
 		self._extract_images_from_text_editor()
 		self._sanitize_content()
 		self._save_passwords()
@@ -505,6 +507,7 @@ class Document(BaseDocument):
 			d._validate_selects()
 			d._validate_non_negative()
 			d._validate_length()
+			d._validate_code_fields()
 			d._extract_images_from_text_editor()
 			d._sanitize_content()
 			d._save_passwords()
@@ -1062,7 +1065,10 @@ class Document(BaseDocument):
 			self.set("modified", now())
 			self.set("modified_by", frappe.session.user)
 
-		self.load_doc_before_save()
+		# load but do not reload doc_before_save because before_change or on_change might expect it
+		if not self.get_doc_before_save():
+			self.load_doc_before_save()
+
 		# to trigger notification on value change
 		self.run_method('before_change')
 
@@ -1202,8 +1208,8 @@ class Document(BaseDocument):
 			doc.set(fieldname, flt(doc.get(fieldname), self.precision(fieldname, doc.parentfield)))
 
 	def get_url(self):
-		"""Returns Desk URL for this document. `/app/Form/{doctype}/{name}`"""
-		return "/app/Form/{doctype}/{name}".format(doctype=self.doctype, name=self.name)
+		"""Returns Desk URL for this document."""
+		return get_absolute_url(self.doctype, self.name)
 
 	def add_comment(self, comment_type='Comment', text=None, comment_email=None, link_doctype=None, link_name=None, comment_by=None):
 		"""Add a comment to this document.

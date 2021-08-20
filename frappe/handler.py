@@ -55,7 +55,7 @@ def execute_cmd(cmd, from_async=False):
 	try:
 		method = get_attr(cmd)
 	except Exception as e:
-		frappe.throw(_('Invalid Method'))
+		frappe.throw(_('Failed to get method for command {0} with {1}').format(cmd, e))
 
 	if from_async:
 		method = method.queue
@@ -228,10 +228,7 @@ def run_doc_method(method, docs=None, dt=None, dn=None, arg=None, args=None):
 	is_whitelisted(fn)
 	is_valid_http_method(fn)
 
-	try:
-		fnargs = inspect.getargspec(method_obj)[0]
-	except ValueError:
-		fnargs = inspect.getfullargspec(method_obj).args
+	fnargs = inspect.getfullargspec(method_obj).args
 
 	if not fnargs or (len(fnargs)==1 and fnargs[0]=="self"):
 		response = doc.run_method(method)

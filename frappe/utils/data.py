@@ -9,6 +9,7 @@ import json
 import re, datetime, math, time
 from six.moves.urllib.parse import quote, urljoin
 from six import iteritems, text_type, string_types, integer_types
+from code import compile_command
 from frappe.desk.utils import slug
 
 DATE_FORMAT = "%Y-%m-%d"
@@ -326,7 +327,7 @@ def format_date(string_date=None, format_string=None):
 	date = getdate(string_date)
 	if not format_string:
 		format_string = get_user_date_format()
-	format_string = format_string.replace("mm", "MM")
+	format_string = format_string.replace("mm", "MM").replace("Y", "y")
 	try:
 		formatted_date = babel.dates.format_date(
 			date, format_string,
@@ -621,6 +622,26 @@ def ceil(s):
 
 def cstr(s, encoding='utf-8'):
 	return frappe.as_unicode(s, encoding)
+
+def sbool(x):
+	"""Converts str object to Boolean if possible.
+	Example:
+		"true" becomes True
+		"1" becomes True
+		"{}" remains "{}"
+
+	Args:
+		x (str): String to be converted to Bool
+
+	Returns:
+		object: Returns Boolean or type(x)
+	"""
+	from distutils.util import strtobool
+
+	try:
+		return bool(strtobool(x))
+	except Exception:
+		return x
 
 def rounded(num, precision=0):
 	"""round method for round halfs to nearest even algorithm aka banker's rounding - compatible with python3"""
@@ -1278,7 +1299,9 @@ def make_filter_dict(filters):
 
 def sanitize_column(column_name):
 	from frappe import _
+	import sqlparse
 	regex = re.compile("^.*[,'();].*")
+	column_name = sqlparse.format(column_name, strip_comments=True, keyword_case="lower")
 	blacklisted_keywords = ['select', 'create', 'insert', 'delete', 'drop', 'update', 'case', 'and', 'or']
 
 	def _raise_exception():
@@ -1490,6 +1513,34 @@ def get_user_info_for_avatar(user_id):
 	except Exception:
 		frappe.local.message_log = []
 	return user_info
+
+
+def validate_python_code(string: str, fieldname=None, is_expression: bool = True) -> None:
+	""" Validate python code fields by using compile_command to ensure that expression is valid python.
+
+	args:
+		fieldname: name of field being validated.
+		is_expression: true for validating simple single line python expression, else validated as script.
+	"""
+
+	if not string:
+		return
+
+	try:
+		compile_command(string, symbol="eval" if is_expression else "exec")
+	except SyntaxError as se:
+		line_no = se.lineno - 1 or 0
+		offset = se.offset - 1 or 0
+		error_line = string if is_expression else string.split("\n")[line_no]
+		msg = (frappe._("{} Invalid python code on line {}")
+				.format(fieldname + ":" if fieldname else "", line_no+1))
+		msg += f"<br><pre>{error_line}</pre>"
+		msg += f"<pre>{' ' * offset}^</pre>"
+
+		frappe.throw(msg, title=frappe._("Syntax Error"))
+	except Exception as e:
+		frappe.msgprint(frappe._("{} Possibly invalid python code. <br>{}")
+				.format(fieldname + ": " or "", str(e)), indicator="orange")
 
 
 class UnicodeWithAttrs(text_type):

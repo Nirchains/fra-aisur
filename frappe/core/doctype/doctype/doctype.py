@@ -18,6 +18,7 @@ from frappe import _
 from frappe.utils import now, cint
 from frappe.model import no_value_fields, default_fields, data_fieldtypes, table_fields, data_field_options
 from frappe.model.document import Document
+from frappe.model.base_document import get_controller
 from frappe.custom.doctype.property_setter.property_setter import make_property_setter
 from frappe.custom.doctype.custom_field.custom_field import create_custom_field
 from frappe.desk.notifications import delete_notification_count_for
@@ -107,8 +108,6 @@ class DocType(Document):
 		if self.name in core_doctypes:
 			return
 
-		from frappe.model.base_document import get_controller
-
 		try:
 			controller = get_controller(self.name)
 		except ImportError:
@@ -123,6 +122,9 @@ class DocType(Document):
 		}
 
 		for docfield in self.get("fields") or []:
+			if docfield.fieldtype in no_value_fields:
+				continue
+
 			conflict_type = None
 			field = docfield.fieldname
 			field_label = docfield.label or docfield.fieldname
@@ -671,12 +673,12 @@ class DocType(Document):
 		flags = {"flags": re.ASCII} if six.PY3 else {}
 
 		# a DocType name should not start or end with an empty space
-		if re.search("^[ \t\n\r]+|[ \t\n\r]+$", name, **flags):
+		if re.search(r"^[ \t\n\r]+|[ \t\n\r]+$", name, **flags):
 			frappe.throw(_("DocType's name should not start or end with whitespace"), frappe.NameError)
 
 		# a DocType's name should not start with a number or underscore
 		# and should only contain letters, numbers and underscore
-		if not re.match("^(?![\W])[^\d_\s][\w ]+$", name, **flags):
+		if not re.match(r"^(?![\W])[^\d_\s][\w ]+$", name, **flags):
 			frappe.throw(_("DocType's name should start with a letter and it can only consist of letters, numbers, spaces and underscores"), frappe.NameError)
 
 		validate_route_conflict(self.doctype, self.name)
@@ -732,6 +734,19 @@ def validate_links_table_fieldnames(meta):
 		if not link_meta.get_field(link.link_fieldname):
 			message = _("Row #{0}: Could not find field {1} in {2} DocType").format(index+1, frappe.bold(link.link_fieldname), frappe.bold(link.link_doctype))
 			frappe.throw(message, InvalidFieldNameError, _("Invalid Fieldname"))
+
+		if link.is_child_table and not meta.get_field(link.table_fieldname):
+			message = _("Row #{0}: Could not find field {1} in {2} DocType").format(index+1, frappe.bold(link.table_fieldname), frappe.bold(meta.name))
+			frappe.throw(message, frappe.ValidationError, _("Invalid Table Fieldname"))
+
+		if link.is_child_table:
+			if not link.parent_doctype:
+				message = _("Row #{0}: Parent DocType is mandatory for internal links").format(index+1)
+				frappe.throw(message, frappe.ValidationError, _("Parent Missing"))
+
+			if not link.table_fieldname:
+				message = _("Row #{0}: Table Fieldname is mandatory for internal links").format(index+1)
+				frappe.throw(message, frappe.ValidationError, _("Table Fieldname Missing"))
 
 def validate_fields_for_doctype(doctype):
 	meta = frappe.get_meta(doctype, cached=False)
@@ -964,7 +979,7 @@ def validate_fields(meta):
 		for field in depends_on_fields:
 			depends_on = docfield.get(field, None)
 			if depends_on and ("=" in depends_on) and \
-				re.match("""[\w\.:_]+\s*={1}\s*[\w\.@'"]+""", depends_on):
+				re.match(r'[\w\.:_]+\s*={1}\s*[\w\.@\'"]+', depends_on):
 				frappe.throw(_("Invalid {0} condition").format(frappe.unscrub(field)), frappe.ValidationError)
 
 	def check_table_multiselect_option(docfield):

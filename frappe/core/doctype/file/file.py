@@ -498,7 +498,7 @@ class File(Document):
 		self.file_size = self.check_max_file_size()
 
 		if (
-			self.content_type and "image" in self.content_type
+			self.content_type and self.content_type == "image/jpeg"
 			and frappe.get_system_settings("strip_exif_metadata_from_uploaded_images")
 		):
 			self.content = strip_exif_data(self.content, self.content_type)
@@ -709,7 +709,10 @@ def get_web_image(file_url):
 			frappe.msgprint(_("Unable to read file format for {0}").format(file_url))
 		raise
 
-	image = Image.open(StringIO(frappe.safe_decode(r.content)))
+	try:
+		image = Image.open(StringIO(frappe.safe_decode(r.content)))
+	except Exception as e:
+		frappe.msgprint(_("Image link '{0}' is not valid").format(file_url), raise_exception=e)
 
 	try:
 		filename, extn = file_url.rsplit("/", 1)[1].rsplit(".", 1)
@@ -912,7 +915,7 @@ def extract_images_from_html(doc, content):
 		return '<img src="{file_url}"'.format(file_url=file_url)
 
 	if content and isinstance(content, string_types):
-		content = re.sub('<img[^>]*src\s*=\s*["\'](?=data:)(.*?)["\']', _save_file, content)
+		content = re.sub(r'<img[^>]*src\s*=\s*["\'](?=data:)(.*?)["\']', _save_file, content)
 
 	return content
 
