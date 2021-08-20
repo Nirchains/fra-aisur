@@ -291,9 +291,7 @@ frappe.Application = Class.extend({
 		}
 		if (!frappe.workspaces['home']) {
 			// default workspace is settings for Frappe
-			//frappe.workspaces['home'] = frappe.workspaces['build'];
-			//PFG
-			frappe.workspaces['home'] = frappe.workspaces['diseñador'];
+			frappe.workspaces['home'] = frappe.workspaces['build'];
 		}
 	},
 
