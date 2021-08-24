@@ -58,6 +58,7 @@
   "misc_section",
   "subdomain",
   "disable_signup",
+  "hide_signup",
   "section_break_38",
   "head_html",
   "robots_txt",
@@ -425,6 +426,12 @@
    "fieldname": "navbar_template_section",
    "fieldtype": "Section Break",
    "label": "Navbar Template"
+  },
+  {
+   "default": "0",
+   "fieldname": "hide_signup",
+   "fieldtype": "Check",
+   "label": "Ocultar registro"
   }
  ],
  "icon": "fa fa-cog",
@@ -433,7 +440,7 @@
  "issingle": 1,
  "links": [],
  "max_attachments": 10,
- "modified": "2021-07-15 17:39:56.609771",
+ "modified": "2021-08-24 07:19:15.899979",
  "modified_by": "Administrator",
  "module": "Website",
  "name": "Website Settings",

@@ -192,7 +192,9 @@ export default class WebForm extends frappe.ui.FieldGroup {
 
 		const success_dialog = new frappe.ui.Dialog({
 			title: __("Saved Successfully"),
-			secondary_action: () => {
+			//PFG: Cambio de secondary por primary
+			primary_action_label: __("Continue"),
+			primary_action: () => {
 				if (this.success_url) {
 					window.location.href = this.success_url;
 				} else if(this.login_required) {
