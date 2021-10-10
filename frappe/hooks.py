@@ -131,7 +131,8 @@ has_website_permission = {
 }
 
 standard_queries = {
-	"User": "frappe.core.doctype.user.user.user_query"
+	#"User": "frappe.core.doctype.user.user.user_query"
+	"User": "aisurveys.utils.user_query"
 }
 
 doc_events = {
