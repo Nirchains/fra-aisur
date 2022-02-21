@@ -88,6 +88,9 @@ def sync_for(app_name, force=0, sync_everything = False, verbose=False, reset_pe
 def get_doc_files(files, start_path):
 	"""walk and sync all doctypes and pages"""
 
+	if not files:
+		files = []
+
 	# load in sequence - warning for devs
 	document_types = ['doctype', 'page', 'report', 'dashboard_chart_source', 'print_format',
 		'website_theme', 'web_form', 'web_template', 'notification', 'print_style',

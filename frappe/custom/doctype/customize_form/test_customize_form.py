@@ -189,6 +189,26 @@ class TestCustomizeForm(unittest.TestCase):
 	def test_core_doctype_customization(self):
 		self.assertRaises(frappe.ValidationError, self.get_customize_form, 'User')
 
+	def test_save_customization_length_field_property(self):
+		# Using Notification Log doctype as it doesn't have any other custom fields
+		d = self.get_customize_form("Notification Log")
+
+		document_name = d.get("fields", {"fieldname": "document_name"})[0]
+		document_name.length = 255
+		d.run_method("save_customization")
+
+		self.assertEqual(frappe.db.get_value("Property Setter",
+			{"doc_type": "Notification Log", "property": "length", "field_name": "document_name"}, "value"), '255')
+
+		self.assertTrue(d.flags.update_db)
+
+		length = frappe.db.sql("""SELECT character_maximum_length
+			FROM information_schema.columns
+			WHERE table_name = 'tabNotification Log'
+			AND column_name = 'document_name'""")[0][0]
+
+		self.assertEqual(length, 255)
+
 	def test_custom_link(self):
 		try:
 			# create a dummy doctype linked to Event
@@ -285,3 +305,25 @@ class TestCustomizeForm(unittest.TestCase):
 
 		action = [d for d in event.actions if d.label=='Test Action']
 		self.assertEqual(len(action), 0)
+
+	def test_custom_label(self):
+		d = self.get_customize_form("Event")
+
+		# add label
+		d.label = "Test Rename"
+		d.run_method("save_customization")
+		self.assertEqual(d.label, "Test Rename")
+
+		# change label
+		d.label = "Test Rename 2"
+		d.run_method("save_customization")
+		self.assertEqual(d.label, "Test Rename 2")
+
+		# saving again to make sure existing label persists
+		d.run_method("save_customization")
+		self.assertEqual(d.label, "Test Rename 2")
+
+		# clear label
+		d.label = ""
+		d.run_method("save_customization")
+		self.assertEqual(d.label, "")

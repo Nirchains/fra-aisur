@@ -1,5 +1,4 @@
 {
- "actions": [],
  "creation": "2019-08-13 17:24:05.470876",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -101,8 +100,7 @@
   }
  ],
  "issingle": 1,
- "links": [],
- "modified": "2021-05-11 02:45:13.590202",
+ "modified": "2020-09-18 17:26:09.703215",
  "modified_by": "Administrator",
  "module": "Integrations",
  "name": "Google Drive",
@@ -129,7 +127,6 @@
    "write": 1
   }
  ],
- "restrict_to_domain": "Administration",
  "sort_field": "modified",
  "sort_order": "ASC",
  "track_changes": 1
