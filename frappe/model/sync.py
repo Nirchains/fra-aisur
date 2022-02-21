@@ -69,13 +69,13 @@ def sync_for(app_name, force=0, sync_everything = False, verbose=False, reset_pe
 
 	for module_name in frappe.local.app_modules.get(app_name) or []:
 		folder = os.path.dirname(frappe.get_module(app_name + "." + module_name).__file__)
-		get_doc_files(files, folder)
+		files = get_doc_files(files, folder)
 
 	l = len(files)
+
 	if l:
 		for i, doc_path in enumerate(files):
-			import_file_by_path(doc_path, force=force, ignore_version=True,
-				reset_permissions=reset_permissions, for_sync=True)
+			import_file_by_path(doc_path, force=force, ignore_version=True, reset_permissions=reset_permissions)
 
 			frappe.db.commit()
 
@@ -106,3 +106,5 @@ def get_doc_files(files, start_path):
 					if os.path.exists(doc_path):
 						if not doc_path in files:
 							files.append(doc_path)
+
+	return files
