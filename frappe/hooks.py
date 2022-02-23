@@ -198,18 +198,18 @@ scheduler_events = {
 		"frappe.email.queue.flush",
 		"frappe.email.doctype.email_account.email_account.pull",
 		"frappe.email.doctype.email_account.email_account.notify_unreplied",
-		"frappe.integrations.doctype.razorpay_settings.razorpay_settings.capture_payment",
+#		"frappe.integrations.doctype.razorpay_settings.razorpay_settings.capture_payment",
 		'frappe.utils.global_search.sync_global_search',
 		"frappe.monitor.flush",
 	],
 	"hourly": [
-		"frappe.model.utils.link_count.update_link_count",
+#		"frappe.model.utils.link_count.update_link_count",
 		'frappe.model.utils.user_settings.sync_user_settings',
 		"frappe.utils.error.collect_error_snapshots",
 		"frappe.desk.page.backups.backups.delete_downloadable_backups",
 		"frappe.deferred_insert.save_to_db",
 		"frappe.desk.form.document_follow.send_hourly_updates",
-		"frappe.integrations.doctype.google_calendar.google_calendar.sync",
+#		"frappe.integrations.doctype.google_calendar.google_calendar.sync",
 		"frappe.email.doctype.newsletter.newsletter.send_scheduled_email"
 	],
 	"daily": [
