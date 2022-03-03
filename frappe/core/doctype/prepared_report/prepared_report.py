@@ -50,6 +50,11 @@ def run_background(prepared_report):
 		instance.status = "Completed"
 		instance.columns = json.dumps(result["columns"])
 		instance.report_end_time = frappe.utils.now()
+		instance.parametros = ""
+		filters = json.loads(instance.filters)
+		for key,val in filters.items():
+			instance.parametros = "{0}-{1}".format(instance.parametros,val)
+
 		instance.save(ignore_permissions=True)
 
 	except Exception:
