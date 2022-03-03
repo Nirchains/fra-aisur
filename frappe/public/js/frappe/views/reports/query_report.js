@@ -705,7 +705,9 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 			"Edit": {
 				label: __("Edit"),
 				click: () => {
-					frappe.set_route(frappe.get_route());
+					//frappe.set_route(frappe.get_route());
+					frappe.set_route(frappe.get_route()[0], frappe.get_route()[1]);
+					window.location.reload();
 				}
 			},
 			"Rebuild": {
