@@ -180,7 +180,8 @@ def download_private_file(path):
 		_file = frappe.get_doc("File", f)
 		can_access = _file.is_downloadable()
 		if can_access:
-			make_access_log(doctype='File', document=_file.name, file_type=os.path.splitext(path)[-1][1:])
+			#PFG Disable access log	to private file
+		   	#make_access_log(doctype='File', document=_file.name, file_type=os.path.splitext(path)[-1][1:])
 			break
 
 	if not can_access:
